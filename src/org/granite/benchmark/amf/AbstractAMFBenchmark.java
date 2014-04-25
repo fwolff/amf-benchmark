@@ -58,10 +58,10 @@ public abstract class AbstractAMFBenchmark {
 	
 	private static String size(int size) {
 		if (size < (1 << 10))
-			return String.format("%,d bytes", size);
+			return String.format(Locale.US, "%,d bytes", size);
 		if (size < (1 << 20))
-			return String.format("%,d bytes (%,.1f kb)", size, ((double)size / (1 << 10)));
-		return String.format("%,d bytes (%,.1f mb)", size, ((double)size / (1 << 20)));
+			return String.format(Locale.US, "%,d bytes (%,.1f kb)", size, ((double)size / (1 << 10)));
+		return String.format(Locale.US, "%,d bytes (%,.1f mb)", size, ((double)size / (1 << 20)));
 	}
 	
 	private static String time(long milliseconds) {

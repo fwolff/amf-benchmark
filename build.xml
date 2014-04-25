@@ -56,6 +56,7 @@
         <javac srcdir="${src}" destdir="${bin}" includeantruntime="no">
         	<classpath refid="compiler-classpath"/>
 		</javac>
+		<copy file="${src}/granite-config.xml" todir="${bin}"/>
     </target>
 	
 	<!-- Benchmark data creation -->

@@ -1,8 +1,8 @@
 package org.granite.benchmark.amf;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import flex.messaging.io.MessageIOConstants;
 import flex.messaging.io.SerializationContext;
@@ -11,6 +11,8 @@ import flex.messaging.io.amf.AmfMessageSerializer;
 
 public class BenchmarkBlazeDSAmf extends AbstractAMFBenchmark {
 
+	private SerializationContext serializationContext;
+	
 	public static void main(String[] args) throws Exception {
 		BenchmarkBlazeDSAmf benchmark = new BenchmarkBlazeDSAmf();
 		benchmark.runBenchmak(args);
@@ -18,28 +20,25 @@ public class BenchmarkBlazeDSAmf extends AbstractAMFBenchmark {
 
 	@Override
 	protected void setup() throws Exception {
+		serializationContext = new SerializationContext();
 	}
 
 	@Override
-	protected byte[] serialize(Object o) throws IOException {
-		ByteArrayOutputStream out = getOutputStream();
-		
+	protected void serialize(Object o, OutputStream out) throws IOException {
 		AmfMessageSerializer serializer = new AmfMessageSerializer();
 		serializer.setVersion(MessageIOConstants.AMF3);
-		serializer.initialize(new SerializationContext(), out, null);
+		serializer.initialize(serializationContext, out, null);
 		serializer.writeObject(o);
-		
-		return out.toByteArray();
 	}
 
 	@Override
-	protected Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-		ByteArrayInputStream bais = new ByteArrayInputStream(data);
+	protected Object deserialize(InputStream in) throws IOException, ClassNotFoundException {
+		Object o;
 		
 		AmfMessageDeserializer deserializer = new AmfMessageDeserializer();
-		deserializer.initialize(new SerializationContext(), bais, null);
-		Object o = deserializer.readObject();
-		bais.close();
+		deserializer.initialize(serializationContext, in, null);
+		o = deserializer.readObject();
+		in.close();
 		
 		return o;
 	}

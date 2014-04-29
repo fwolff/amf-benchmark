@@ -1,8 +1,8 @@
 package org.granite.benchmark.amf;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.granite.config.GraniteConfig;
 import org.granite.config.flex.ServicesConfig;
@@ -34,29 +34,22 @@ public class BenchmarkGraniteDSAmf extends AbstractAMFBenchmark {
 	}
 
 	@Override
-	protected byte[] serialize(Object o) throws IOException {
-		ByteArrayOutputStream out = getOutputStream();
-		
+	protected void serialize(Object o, OutputStream out) throws IOException {
 		SimpleGraniteContext.createThreadInstance(graniteConfig, servicesConfig, null);
-		
 		AMF3Serializer serializer = new AMF3Serializer(out);
 		serializer.writeObject(o);
 		serializer.close();
-		
 		GraniteContext.release();
-		
-		return out.toByteArray();
 	}
 
 	@Override
-	protected Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
+	protected Object deserialize(InputStream in) throws IOException, ClassNotFoundException {
+		Object o;
+		
 		SimpleGraniteContext.createThreadInstance(graniteConfig, servicesConfig, null);
-		
-		ByteArrayInputStream bais = new ByteArrayInputStream(data);
-		AMF3Deserializer deserializer = new AMF3Deserializer(bais);
-		Object o = deserializer.readObject();
+		AMF3Deserializer deserializer = new AMF3Deserializer(in);
+		o = deserializer.readObject();
 		deserializer.close();
-		
 		GraniteContext.release();
 		
 		return o;

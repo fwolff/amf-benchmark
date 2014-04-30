@@ -37,10 +37,10 @@ benchmark-graniteds-small-list-objects-file:
      [java] -------------------------------------------------------------------------------
      [java]   Benchmark class            : BenchmarkGraniteDSAmf
      [java]   Data file                  : data/small-list-objects.dat
-     [java]   AMF3 serialized size       : 351,150 bytes (342.9 kb)
-     [java]   Iterations                 : 10000
-     [java]   Total serialization time   : 13,537 ms (13.54 s)
-     [java]   Total deserialization time : 14,298 ms (14.30 s)
+     [java]   AMF3 serialized size       : 346,488 bytes (338.4 kb)
+     [java]   Iterations                 : 10,000 times
+     [java]   Total serialization time   : 13,542 ms (13.54 s)
+     [java]   Total deserialization time : 14,133 ms (14.13 s)
      [java] -------------------------------------------------------------------------------
 
 ...
@@ -53,10 +53,10 @@ benchmark-blazeds-small-list-objects-file:
      [java] -------------------------------------------------------------------------------
      [java]   Benchmark class            : BenchmarkBlazeDSAmf
      [java]   Data file                  : data/small-list-objects.dat
-     [java]   AMF3 serialized size       : 351,151 bytes (342.9 kb)
-     [java]   Iterations                 : 10000
-     [java]   Total serialization time   : 33,018 ms (33.02 s)
-     [java]   Total deserialization time : 67,531 ms (67.53 s)
+     [java]   AMF3 serialized size       : 346,488 bytes (338.4 kb)
+     [java]   Iterations                 : 10,000 times
+     [java]   Total serialization time   : 34,072 ms (34.07 s)
+     [java]   Total deserialization time : 67,305 ms (67.31 s)
      [java] -------------------------------------------------------------------------------
 
 ````

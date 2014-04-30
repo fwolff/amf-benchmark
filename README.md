@@ -61,9 +61,9 @@ benchmark-blazeds-small-list-objects-file:
 
 ````
 
-This means that GraniteDS takes 13.54 seconds to serialize 10.000 times a 'small' list of objects (50 objects, each
-containing a set of other objects) and 14.30 seconds to deserialize them (10.000 times again). The size of the
+This means that GraniteDS takes 13.54 seconds to serialize 10,000 times a 'small' list of objects (50 objects, each
+containing a set of other objects) and 14.30 seconds to deserialize them (10,000 times again). The size of the
 serialized data, in AMF3, is also printed, 342.9 kilobytes here.
 
-BlazeDS, on the other hand, needs 33.02 seconds to serialize the exact same data 10.000 times and 67.53 seconds to 
-deserialize them (10.000 times again).
+BlazeDS, on the other hand, needs 33.02 seconds to serialize the exact same data 10,000 times and 67.53 seconds to 
+deserialize them (10,000 times again).

@@ -18,6 +18,11 @@ public class BenchmarkBlazeDSAmf extends AbstractAMFBenchmark {
 	}
 
 	@Override
+	protected String getName() {
+		return "BlazeDS";
+	}
+
+	@Override
 	protected void setup() throws Exception {
 		context = new SerializationContext();
 	}

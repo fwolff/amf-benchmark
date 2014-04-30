@@ -23,6 +23,11 @@ public class BenchmarkGraniteDSAmf extends AbstractAMFBenchmark {
 	}
 
 	@Override
+	protected String getName() {
+		return "GraniteDS";
+	}
+
+	@Override
 	protected void setup() throws Exception {
 		graniteConfig = new GraniteConfig(
 			null,

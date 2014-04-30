@@ -3,21 +3,18 @@ amf-benchmark
 
 AMF3 (de)serialization benchmarks with GraniteDS 3.1 and BlazeDS 4.0.
 
-Requirements
-------------
-
-Java (1.7+ recommended) and Apache Ant (1.8+ recommended)
-
 How to run the benchmarks
 -------------------------
 
-Clone the project:
+You need Java (1.7+ recommended), Apache Ant (1.8+ recommended) and Git (1.8+ recommended).
+
+First, clone the project:
 
 ````bash
 $ git clone https://github.com/fwolff/amf-benchmark.git
 ````
 
-Go to the newly created amf-benchmark directory and run ant:
+Then, go to the newly created amf-benchmark directory and run ant:
 
 ````bash
 $ cd amf-benchmark
@@ -27,7 +24,7 @@ $ ant
 How to read the results
 -----------------------
 
-The benchmark is spawning a new JVM for each test and printing results on the standard output.
+The benchmark spawns a new JVM for each test and prints results on the standard output.
 
 For example, you'll see this kind of report:
 

@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import flex.messaging.io.MessageIOConstants;
 import flex.messaging.io.SerializationContext;
-import flex.messaging.io.amf.AmfMessageDeserializer;
-import flex.messaging.io.amf.AmfMessageSerializer;
+import flex.messaging.io.amf.Amf3Input;
+import flex.messaging.io.amf.Amf3Output;
 
 public class BenchmarkBlazeDSAmf extends AbstractAMFBenchmark {
 
-	private SerializationContext serializationContext;
+	private SerializationContext context;
 	
 	public static void main(String[] args) throws Exception {
 		BenchmarkBlazeDSAmf benchmark = new BenchmarkBlazeDSAmf();
@@ -20,25 +19,25 @@ public class BenchmarkBlazeDSAmf extends AbstractAMFBenchmark {
 
 	@Override
 	protected void setup() throws Exception {
-		serializationContext = new SerializationContext();
+		context = new SerializationContext();
 	}
 
 	@Override
 	protected void serialize(Object o, OutputStream out) throws IOException {
-		AmfMessageSerializer serializer = new AmfMessageSerializer();
-		serializer.setVersion(MessageIOConstants.AMF3);
-		serializer.initialize(serializationContext, out, null);
+		Amf3Output serializer = new Amf3Output(context);
+		serializer.setOutputStream(out);
 		serializer.writeObject(o);
+		serializer.close();
 	}
 
 	@Override
 	protected Object deserialize(InputStream in) throws IOException, ClassNotFoundException {
 		Object o;
 		
-		AmfMessageDeserializer deserializer = new AmfMessageDeserializer();
-		deserializer.initialize(serializationContext, in, null);
+		Amf3Input deserializer = new Amf3Input(context);
+		deserializer.setInputStream(in);
 		o = deserializer.readObject();
-		in.close();
+		deserializer.close();
 		
 		return o;
 	}

@@ -45,7 +45,7 @@ public abstract class AbstractAMFBenchmark {
 		System.out.println("  Benchmark class            : " + getClass().getSimpleName());
 		System.out.println("  Data file                  : " + fileName);
 		System.out.println("  AMF3 serialized size       : " + size(data.length));
-		System.out.println("  Iterations                 : " + count);
+		System.out.println("  Iterations                 : " + count(count));
 		System.out.println("  Total serialization time   : " + time(serializationTime));
 		System.out.println("  Total deserialization time : " + time(deserializationTime));
 		System.out.println("-------------------------------------------------------------------------------");
@@ -61,6 +61,10 @@ public abstract class AbstractAMFBenchmark {
 	
 	private static String time(long milliseconds) {
 		return String.format(Locale.US, "%,d ms (%,.2f s)", milliseconds, milliseconds / 1000.0);
+	}
+	
+	private static String count(int count) {
+		return String.format(Locale.US, "%,d times", count);
 	}
 	
 	private byte[] warmup(Object o, long time) throws IOException, ClassNotFoundException {

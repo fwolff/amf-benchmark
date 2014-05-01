@@ -23,7 +23,7 @@ public class BenchmarkGraniteDSAmf extends AbstractAMFBenchmark {
 	}
 
 	@Override
-	protected String getName() {
+	protected String getPlatformName() {
 		return "GraniteDS";
 	}
 

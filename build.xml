@@ -3,19 +3,34 @@
 <project name="amf-benchmark" default="benchmark-all">
 	
 	<!-- Initialization -->
-	
-	<echo>-------------------------------------------------------------------------------</echo>
-	<echo>  AMF3 Benchmarks (GraniteDS 3.1 vs. BlazeDS 4.0)</echo>
-	<echo>  Using Java version: ${java.version}</echo>
-	<echo>-------------------------------------------------------------------------------</echo>
 
 	<property name="src" value="src"/>
 	<property name="bin" value="bin"/>
 	<property name="data" value="data"/>
 
-	<property name="big-list-objects-file" value="${data}/big-list-objects.dat"/>
-	<property name="small-list-objects-file" value="${data}/small-list-objects.dat"/>
-	<property name="big-list-strings-file" value="${data}/big-list-strings.dat"/>
+	<property name="big-list-objects" value="big-list-objects"/>
+	<property name="small-list-objects" value="small-list-objects"/>
+	<property name="big-list-strings" value="big-list-strings"/>
+
+	<property name="big-list-objects-ser" value="${data}/${big-list-objects}.ser"/>
+	<property name="small-list-objects-ser" value="${data}/${small-list-objects}.ser"/>
+	<property name="big-list-strings-ser" value="${data}/${big-list-strings}.ser"/>
+
+	<property name="big-list-objects-graniteds-amf" value="${data}/${big-list-objects}-graniteds.amf"/>
+	<property name="small-list-objects-graniteds-amf" value="${data}/${small-list-objects}-graniteds.amf"/>
+	<property name="big-list-strings-graniteds-amf" value="${data}/${big-list-strings}-graniteds.amf"/>
+
+	<property name="big-list-objects-blazeds-amf" value="${data}/${big-list-objects}-blazeds.amf"/>
+	<property name="small-list-objects-blazeds-amf" value="${data}/${small-list-objects}-blazeds.amf"/>
+	<property name="big-list-strings-blazeds-amf" value="${data}/${big-list-strings}-blazeds.amf"/>
+
+	<property name="big-list-objects-graniteds-csv" value="${data}/${big-list-objects}-graniteds.csv"/>
+	<property name="small-list-objects-graniteds-csv" value="${data}/${small-list-objects}-graniteds.csv"/>
+	<property name="big-list-strings-graniteds-csv" value="${data}/${big-list-strings}-graniteds.csv"/>
+
+	<property name="big-list-objects-blazeds-csv" value="${data}/${big-list-objects}-blazeds.csv"/>
+	<property name="small-list-objects-blazeds-csv" value="${data}/${small-list-objects}-blazeds.csv"/>
+	<property name="big-list-strings-blazeds-csv" value="${data}/${big-list-strings}-blazeds.csv"/>
 	
 	<property name="big-list-objects-iterations" value="20"/>
 	<property name="small-list-objects-iterations" value="10000"/>
@@ -24,6 +39,15 @@
 	<property name="create-data-class" value="org.granite.benchmark.amf.CreateRandomData"/>
 	<property name="graniteds-benchmark-class" value="org.granite.benchmark.amf.BenchmarkGraniteDSAmf"/>
 	<property name="blazeds-benchmark-class" value="org.granite.benchmark.amf.BenchmarkBlazeDSAmf"/>
+	<property name="graniteds-check-class" value="org.granite.benchmark.amf.CheckBlazeDSAmfOverGraniteDS"/>
+	<property name="blazeds-check-class" value="org.granite.benchmark.amf.CheckGraniteDSAmfOverBlazeDS"/>
+
+	<echo></echo>
+	<echo>-------------------------------------------------------------------------------</echo>
+	<echo>  AMF3 Benchmarks (GraniteDS 3.1 vs. BlazeDS 4.0)</echo>
+	<echo>  Using Java version: ${java.version}</echo>
+	<echo>-------------------------------------------------------------------------------</echo>
+	<echo></echo>
 
 	<mkdir dir="${bin}"/>
 	<mkdir dir="${data}"/>
@@ -61,103 +85,173 @@
 	
 	<!-- Benchmark data creation -->
 
-    <target name="create-big-list-objects-file">
+    <target name="create-big-list-objects">
     	<java fork="yes" classname="${create-data-class}" classpath="${bin}" maxmemory="1024m">
     		<arg value="createObjectList"/>
 			<arg value="10000"/>
-    		<arg value="${big-list-objects-file}"/>
+    		<arg value="${big-list-objects-ser}"/>
     	</java>
     </target>
 
-    <target name="create-small-list-objects-file">
+    <target name="create-small-list-objects">
     	<java fork="yes" classname="${create-data-class}" classpath="${bin}" maxmemory="1024m">
     		<arg value="createObjectList"/>
 			<arg value="50"/>
-    		<arg value="${small-list-objects-file}"/>
+    		<arg value="${small-list-objects-ser}"/>
     	</java>
     </target>
 
-    <target name="create-big-list-strings-file">
+    <target name="create-big-list-strings">
     	<java fork="yes" classname="${create-data-class}" classpath="${bin}" maxmemory="1024m">
     		<arg value="createStringList"/>
 			<arg value="10000"/>
-    		<arg value="${big-list-strings-file}"/>
+    		<arg value="${big-list-strings-ser}"/>
     	</java>
     </target>
 
-    <target name="create-all-data-files" depends="
-    	create-big-list-objects-file,
-    	create-small-list-objects-file,
-    	create-big-list-strings-file"/>
+    <target name="create-all-data" depends="
+    	create-big-list-objects,
+    	create-small-list-objects,
+    	create-big-list-strings"/>
 	
 	<!-- GraniteDS Benchmarks -->
 
-    <target name="benchmark-graniteds-big-list-objects-file">
+    <target name="benchmark-graniteds-big-list-objects">
     	<java fork="yes" classname="${graniteds-benchmark-class}" maxmemory="1024m">
     		<classpath refid="graniteds-classpath"/>
-    		<arg value="${big-list-objects-file}"/>
+    		<arg value="${big-list-objects-ser}"/>
     		<arg value="${big-list-objects-iterations}"/>
+    		<arg value="${big-list-objects-graniteds-amf}"/>
+    		<arg value="${big-list-objects-graniteds-csv}"/>
     	</java>
     </target>
 
-    <target name="benchmark-graniteds-small-list-objects-file">
+    <target name="benchmark-graniteds-small-list-objects">
     	<java fork="yes" classname="${graniteds-benchmark-class}" maxmemory="1024m">
     		<classpath refid="graniteds-classpath"/>
-    		<arg value="${small-list-objects-file}"/>
+    		<arg value="${small-list-objects-ser}"/>
     		<arg value="${small-list-objects-iterations}"/>
+    		<arg value="${small-list-objects-graniteds-amf}"/>
+    		<arg value="${small-list-objects-graniteds-csv}"/>
     	</java>
     </target>
 
-    <target name="benchmark-graniteds-big-list-strings-file">
+    <target name="benchmark-graniteds-big-list-strings">
     	<java fork="yes" classname="${graniteds-benchmark-class}" maxmemory="1024m">
     		<classpath refid="graniteds-classpath"/>
-    		<arg value="${big-list-strings-file}"/>
+    		<arg value="${big-list-strings-ser}"/>
     		<arg value="${big-list-strings-iterations}"/>
+    		<arg value="${big-list-strings-graniteds-amf}"/>
+    		<arg value="${big-list-strings-graniteds-csv}"/>
     	</java>
     </target>
 
     <target name="benchmark-graniteds-all" depends="
-    	benchmark-graniteds-big-list-objects-file,
-    	benchmark-graniteds-small-list-objects-file,
-    	benchmark-graniteds-big-list-strings-file"/>
+    	benchmark-graniteds-big-list-objects,
+    	benchmark-graniteds-small-list-objects,
+    	benchmark-graniteds-big-list-strings"/>
 	
 	<!-- BlazeDS Benchmarks -->
 
-    <target name="benchmark-blazeds-big-list-objects-file">
+    <target name="benchmark-blazeds-big-list-objects">
     	<java fork="yes" classname="${blazeds-benchmark-class}" maxmemory="1024m">
     		<classpath refid="blazeds-classpath"/>
-    		<arg value="${big-list-objects-file}"/>
+    		<arg value="${big-list-objects-ser}"/>
     		<arg value="${big-list-objects-iterations}"/>
+    		<arg value="${big-list-objects-blazeds-amf}"/>
+    		<arg value="${big-list-objects-blazeds-csv}"/>
     	</java>
     </target>
 
-    <target name="benchmark-blazeds-small-list-objects-file">
+    <target name="benchmark-blazeds-small-list-objects">
     	<java fork="yes" classname="${blazeds-benchmark-class}" maxmemory="1024m">
     		<classpath refid="blazeds-classpath"/>
-    		<arg value="${small-list-objects-file}"/>
+    		<arg value="${small-list-objects-ser}"/>
     		<arg value="${small-list-objects-iterations}"/>
+    		<arg value="${small-list-objects-blazeds-amf}"/>
+    		<arg value="${small-list-objects-blazeds-csv}"/>
     	</java>
     </target>
 
-    <target name="benchmark-blazeds-big-list-strings-file">
+    <target name="benchmark-blazeds-big-list-strings">
     	<java fork="yes" classname="${blazeds-benchmark-class}" maxmemory="1024m">
     		<classpath refid="blazeds-classpath"/>
-    		<arg value="${big-list-strings-file}"/>
+    		<arg value="${big-list-strings-ser}"/>
     		<arg value="${big-list-strings-iterations}"/>
+    		<arg value="${big-list-strings-blazeds-amf}"/>
+    		<arg value="${big-list-strings-blazeds-csv}"/>
     	</java>
     </target>
 
     <target name="benchmark-blazeds-all" depends="
-    	benchmark-blazeds-big-list-objects-file,
-    	benchmark-blazeds-small-list-objects-file,
-    	benchmark-blazeds-big-list-strings-file"/>
+    	benchmark-blazeds-big-list-objects,
+    	benchmark-blazeds-small-list-objects,
+    	benchmark-blazeds-big-list-strings"/>
+
+	<!-- GraniteDS AMF Check -->
+
+    <target name="check-graniteds-big-list-objects">
+    	<java fork="yes" classname="${graniteds-check-class}" maxmemory="1024m">
+    		<classpath refid="graniteds-classpath"/>
+    		<arg value="${big-list-objects-blazeds-amf}"/>
+    	</java>
+    </target>
+
+    <target name="check-graniteds-small-list-objects">
+    	<java fork="yes" classname="${graniteds-check-class}" maxmemory="1024m">
+    		<classpath refid="graniteds-classpath"/>
+    		<arg value="${small-list-objects-blazeds-amf}"/>
+    	</java>
+    </target>
+
+    <target name="check-graniteds-big-list-strings">
+    	<java fork="yes" classname="${graniteds-check-class}" maxmemory="1024m">
+    		<classpath refid="graniteds-classpath"/>
+    		<arg value="${big-list-strings-blazeds-amf}"/>
+    	</java>
+    </target>
+
+    <target name="check-graniteds-all" depends="
+    	check-graniteds-big-list-objects,
+    	check-graniteds-small-list-objects,
+    	check-graniteds-big-list-strings"/>
+
+	<!-- BlazeDS AMF Check -->
+
+    <target name="check-blazeds-big-list-objects">
+    	<java fork="yes" classname="${blazeds-check-class}" maxmemory="1024m">
+    		<classpath refid="blazeds-classpath"/>
+    		<arg value="${big-list-objects-graniteds-amf}"/>
+    	</java>
+    </target>
+
+    <target name="check-blazeds-small-list-objects">
+    	<java fork="yes" classname="${blazeds-check-class}" maxmemory="1024m">
+    		<classpath refid="blazeds-classpath"/>
+    		<arg value="${small-list-objects-graniteds-amf}"/>
+    	</java>
+    </target>
+
+    <target name="check-blazeds-big-list-strings">
+    	<java fork="yes" classname="${blazeds-check-class}" maxmemory="1024m">
+    		<classpath refid="blazeds-classpath"/>
+    		<arg value="${big-list-strings-graniteds-amf}"/>
+    	</java>
+    </target>
+
+    <target name="check-blazeds-all" depends="
+    	check-blazeds-big-list-objects,
+    	check-blazeds-small-list-objects,
+    	check-blazeds-big-list-strings"/>
 	
-	<!-- All Benchmarks -->
+	<!-- All In One -->
 
     <target name="benchmark-all" depends="
     	build,
-    	create-all-data-files,
+    	create-all-data,
     	benchmark-graniteds-all,
-    	benchmark-blazeds-all"/>
+    	benchmark-blazeds-all,
+    	check-graniteds-all,
+    	check-blazeds-all"/>
 
 </project>

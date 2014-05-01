@@ -18,7 +18,7 @@ public class BenchmarkBlazeDSAmf extends AbstractAMFBenchmark {
 	}
 
 	@Override
-	protected String getName() {
+	protected String getPlatformName() {
 		return "BlazeDS";
 	}
 

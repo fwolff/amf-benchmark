@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,61 +17,72 @@ import java.util.Locale;
 
 public abstract class AbstractAMFBenchmark {
 	
+	private static final long WARMUP_TIME_MS = 20000L;
+	
 	public AbstractAMFBenchmark() {
 	}
 
-	protected abstract String getName();
+	protected abstract String getPlatformName();
 	protected abstract void setup() throws Exception;
 	protected abstract void serialize(Object o, OutputStream out) throws IOException;
 	protected abstract Object deserialize(InputStream in) throws IOException, ClassNotFoundException;
 	
 	protected void runBenchmak(String[] args) throws Exception {
-		if (args.length != 2)
+		if (args.length != 4)
 			throw new IllegalArgumentException("Illegal arguments count: " + Arrays.toString(args));
 		
-		File dataFile = new File(args[0]);
+		File javaFile = new File(args[0]);
 		int count = Integer.parseInt(args[1]);
-		
-		System.out.println("Reading data from file: " + dataFile);
-		Object o = readData(dataFile);
+		File amfFile = new File(args[2]);
+		File csvFile = new File(args[3]);
 
-		System.out.println("Warming up...");
+		System.out.println("Reading Java data from file: " + javaFile);
+		Object o = readData(javaFile);
+
+		System.out.println("Setting up " + getPlatformName());
 		setup();
-		byte[] data = warmup(o, 20000L);
-		System.gc();
+
+		System.out.println("Warming up (~" + (WARMUP_TIME_MS / 1000) + " s)...");
+		warmup(o, WARMUP_TIME_MS);
 		
 		System.out.println("Benchmarking serialization...");
-		long serializationTime = benchmarkSerialization(o, count, data.length);
+		final long serializationTime = benchmarkSerialization(o, count, (int)javaFile.length());
+		System.gc();
+		
+		byte[] data = getAmfData(o, (int)javaFile.length());
+		final int amfDataSize = data.length;
+		System.out.println("Saving AMF3 data to file: " + amfFile);
+		writeDataToFile(data, amfFile);
+		o = null;
 		System.gc();
 		
 		System.out.println("Benchmarking deserialization...");
-		long deserializationTime = benchmarkDeserialization(data, count);
+		final long deserializationTime = benchmarkDeserialization(data, count);
+		data = null;
+		System.gc();
 		
-		System.out.println("-------------------------------------------------------------------------------");
-		System.out.println("  Benchmark class            : " + getClass().getSimpleName());
-		System.out.println("  Data file                  : " + dataFile);
-		System.out.println("  AMF3 serialized size       : " + size(data.length));
-		System.out.println("  Iterations                 : " + count(count));
-		System.out.println("  Total serialization time   : " + time(serializationTime));
-		System.out.println("  Total deserialization time : " + time(deserializationTime));
-		System.out.println("-------------------------------------------------------------------------------");
-		
-		File results = new File(dataFile.getParent() + "/" + getName().toLowerCase() + "-" + dataFile.getName() + ".csv");
-		boolean writeHeader = !results.exists();
-		
-		System.out.println("Writing result to file: " + results);
-		
-		PrintWriter writer = new PrintWriter(new FileWriter(results, true));
+		System.out.println("Writing benchmark result to file: " + csvFile);
+		boolean writeHeader = !csvFile.exists();
+		PrintWriter writer = new PrintWriter(new FileWriter(csvFile, true));
 		if (writeHeader)
 			writer.println("Date,Amf3 Size,Iterations,Serialization Time,Deserialization Time");
 		writer.println(
 			new Date().toString() + "," +
-			data.length + "," +
+			amfDataSize + "," +
 			count + "," +
 			String.format(Locale.US, "%,.2f", serializationTime / 1000.0) + "," +
 			String.format(Locale.US, "%,.2f", deserializationTime / 1000.0)
 		);
 		writer.close();
+		
+		System.out.println("-------------------------------------------------------------------------------");
+		System.out.println("  Platform                   : " + getPlatformName());
+		System.out.println("  Java input file            : " + javaFile);
+		System.out.println("  AMF3 output size           : " + size(amfDataSize));
+		System.out.println("  Iterations                 : " + count(count));
+		System.out.println("  Total serialization time   : " + time(serializationTime));
+		System.out.println("  Total deserialization time : " + time(deserializationTime));
+		System.out.println("-------------------------------------------------------------------------------");
 	}
 	
 	private static String size(int size) {
@@ -89,7 +101,7 @@ public abstract class AbstractAMFBenchmark {
 		return String.format(Locale.US, "%,d times", count);
 	}
 	
-	private byte[] warmup(Object o, long time) throws IOException, ClassNotFoundException {
+	private void warmup(Object o, long timeMs) throws IOException, ClassNotFoundException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		
 		final long t1 = System.currentTimeMillis();
@@ -98,8 +110,11 @@ public abstract class AbstractAMFBenchmark {
 			deserialize(new ByteArrayInputStream(baos.toByteArray()));
 			baos.reset();
 		}
-		while (System.currentTimeMillis() - t1 < time);
-		
+		while (System.currentTimeMillis() - t1 < timeMs);
+	}
+	
+	private byte[] getAmfData(Object o, int size) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(size);
 		serialize(o, baos);
 		return baos.toByteArray();
 	}
@@ -135,5 +150,11 @@ public abstract class AbstractAMFBenchmark {
 		Object o = in.readObject();
 		in.close();
 		return o;
+	}
+	
+	private static void writeDataToFile(byte[] data, File file) throws IOException {
+		FileOutputStream fos = new FileOutputStream(file);
+		fos.write(data);
+		fos.close();
 	}
 }

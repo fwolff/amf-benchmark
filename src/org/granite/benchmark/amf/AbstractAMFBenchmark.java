@@ -44,6 +44,7 @@ public abstract class AbstractAMFBenchmark {
 
 		System.out.println("Warming up (~" + (WARMUP_TIME_MS / 1000) + " s)...");
 		warmup(o, WARMUP_TIME_MS);
+		System.gc();
 		
 		System.out.println("Benchmarking serialization...");
 		final long serializationTime = benchmarkSerialization(o, count, (int)javaFile.length());
